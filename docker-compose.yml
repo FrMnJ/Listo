@@ -1,0 +1,39 @@
+services:
+  traefik:
+    image: traefik:v2.10
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+      - "8080:8080" # Traefik dashboard
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+
+  users-db:
+    image: mariadb:lts-ubi9
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: users
+      MYSQL_USER: listo
+      MYSQL_PASSWORD: listo
+    volumes:
+      - users-db:/var/lib/mysql
+
+  users-service: 
+    build: ./users
+    depends_on:
+      - users-db
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.service-users.rule=PathPrefix(`/users`)"
+      - "traefik.http.services.service-a.loadbalancer.server.port=8000"
+    expose:
+      - 8080
+
+networks: 
+  users-service-network:
+    driver: bridge
+volumes: 
+  users-db:
