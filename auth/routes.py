@@ -1,4 +1,3 @@
-import auth.auth
 from models import User
 from schemas import UserCreate, UserLogin
 from fastapi import APIRouter, HTTPException, status
@@ -6,7 +5,7 @@ import auth
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
-@router.post("/register", response_model=User, status_code=status.HTTP_201_CREATED)
+@router.post("/register",response_model=dict, status_code=status.HTTP_201_CREATED)
 async def create_user(user: UserCreate) -> User:
     existing_user = await User.get_or_none(email=user.email)
     if existing_user:
@@ -32,7 +31,7 @@ async def create_user(user: UserCreate) -> User:
         "user": new_user
     }
 
-@router.post("/login", response_model=str, status_code=status.HTTP_200_OK)
+@router.post("/login", response_model=dict, status_code=status.HTTP_200_OK)
 async def login_user(user: UserLogin) -> str:
     user = await User.get_or_none(email=user.email)
     if not user:

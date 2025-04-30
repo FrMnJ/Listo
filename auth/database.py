@@ -10,6 +10,6 @@ async def init_db():
     db_url = f"postgres://{user}:{password}@{host}:{port}/{db}"
     await Tortoise.init(
         db_url=db_url,
-        modules={"models": ["app.models"]}
+        modules={"models": ["models"]}
     )
     await Tortoise.generate_schemas()
