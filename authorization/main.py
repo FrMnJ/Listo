@@ -5,7 +5,7 @@ from contextlib  import asynccontextmanager
 from dotenv import load_dotenv
 from strawberry.fastapi import GraphQLRouter
 import strawberry
-from strawberry_core import Query
+from strawberry_core import Mutation, Query
 from models import Role
 
 @asynccontextmanager
@@ -14,7 +14,7 @@ async def lifespan(app: FastAPI):
    await init_db()
    yield     
 
-schema = strawberry.Schema(query=Query)
+schema = strawberry.Schema(query=Query, mutation=Mutation)
 graphql_app = GraphQLRouter(schema)
 
 app = FastAPI(lifespan=lifespan, root_path="/authorization")
