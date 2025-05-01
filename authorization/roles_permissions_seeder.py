@@ -18,7 +18,10 @@ async def seed_roles_permissions():
             else:
                 print(f"Permission already exists: {permission_name}")
 
+            print(f"Role: {role_obj.name}, Permission: {permission_obj.name}")
             role_permission_obj = await RolePermission.get_or_none(role=role_obj, permission=permission_obj)
+            if role_permission_obj:
+                print(f"RolePermission already exists: {role_permission_obj.role_id} - {role_permission_obj.permission_id}")
             if not role_permission_obj:
                 await RolePermission.create(role=role_obj, permission=permission_obj)
                 print(f"Assigned permission '{permission_name}' to role '{role_name}'")

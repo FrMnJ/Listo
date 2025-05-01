@@ -21,6 +21,17 @@ app = FastAPI(lifespan=lifespan, root_path="/authorization")
 
 app.include_router(graphql_app, prefix="/graphql", tags=["graphql"])
 app.include_router(authorization.router, tags=["authorization"])
+@app.get("/debug/roles", tags=["debug"], response_model=list[dict])
 async def debug_roles():
     roles = await Role.all()
-    return [{"id": r.id, "name": r.name} for r in roles]
+    # Fetch related permissions for each role
+    for role in roles:
+        await role.fetch_related("permissions")
+    return [
+        {
+            "id": r.id,
+            "name": r.name,
+            "permissions": [permission.dict() for permission in r.permissions],
+        }
+        for r in roles
+    ]

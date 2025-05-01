@@ -5,11 +5,13 @@ from typing import List, Optional
 class PermissionType:
     id: int
     name: str
+    roles: List["RoleType"] = strawberry.field(default_factory=list)
 
 @strawberry.type
 class RoleType:
     id: int
     name: str
+    permissions: List[PermissionType] = strawberry.field(default_factory=list)
 
 @strawberry.type
 class UserRoleType:
