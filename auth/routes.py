@@ -1,9 +1,18 @@
 from models import User
-from schemas import UserCreate, UserLogin
+from schemas import UserCreate, UserLogin, UserOut
 from fastapi import APIRouter, HTTPException, status
 import auth
+import json
 
-router = APIRouter(prefix="/auth", tags=["auth"])
+router = APIRouter()
+
+@router.get("/health", response_model=dict, status_code=status.HTTP_200_OK)
+async def health_check() -> dict:
+    return {
+        "success": True,
+        "message": "API is healthy",
+        "status": "OK"
+    }
 
 @router.post("/register",response_model=dict, status_code=status.HTTP_201_CREATED)
 async def create_user(user: UserCreate) -> User:
@@ -28,18 +37,18 @@ async def create_user(user: UserCreate) -> User:
     return {
         "success": True,
         "message": "User created successfully",
-        "user": new_user
+        "user": new_user.dict()
     }
 
 @router.post("/login", response_model=dict, status_code=status.HTTP_200_OK)
-async def login_user(user: UserLogin) -> str:
-    user = await User.get_or_none(email=user.email)
+async def login_user(user_login: UserLogin) -> str:
+    user = await User.get_or_none(email=user_login.email)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid credentials"
         )
-    if not auth.verify_password(user.password, user.hashed_password):
+    if not auth.verify_password(user_login.password, user.hashed_password):
         raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid credentials"
