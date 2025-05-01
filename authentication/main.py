@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from database import init_db
-import routes as auth
+import routes as authentication
 from contextlib  import asynccontextmanager
 from dotenv import load_dotenv
 
@@ -10,7 +10,7 @@ async def lifespan(app: FastAPI):
    await init_db()
    yield     
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(lifespan=lifespan, root_path="/authentication")
 
 
-app.include_router(auth.router, prefix="/auth", tags=["auth"])
+app.include_router(authentication.router, tags=["authentication"])

@@ -3,7 +3,6 @@ from schemas import UserCreate, UserLogin, UserOut, VerifyToken
 from fastapi import APIRouter, HTTPException, status
 from fastapi.responses import JSONResponse
 import auth
-import json
 
 router = APIRouter()
 

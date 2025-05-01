@@ -9,7 +9,7 @@ class Role(Model):
 
 class UserRole(Model):
     id = fields.IntField(pk=True)
-    user = fields.ForeignKeyField("models.User", related_name="user_roles")
+    user = fields.IntField() 
     role = fields.ForeignKeyField("models.Role", related_name="user_roles")
     created_at = fields.DatetimeField(auto_now_add=True)
     updated_at = fields.DatetimeField(auto_now=True)

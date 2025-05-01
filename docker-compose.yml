@@ -1,12 +1,18 @@
 services:
+  authorization_db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: listo
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: authorization_db  
+    volumes:
+      - authorization-db:/var/lib/postgresql/data
   authentication_db:
     image: postgres:latest
     environment:
       POSTGRES_USER: listo
       POSTGRES_PASSWORD: password
       POSTGRES_DB: authentication_db  
-    ports:
-      - "5432:5432"
     volumes:
       - authentication-db:/var/lib/postgresql/data
   authentication-service: 
@@ -17,5 +23,14 @@ services:
       - authentication_db
     ports:
       - "8000:8000"
+  authorization-service: 
+    build: ./authorization
+    volumes:
+      - ./authorization:/app
+    depends_on:
+      - authorization_db
+    ports:
+      - "8001:8000"
 volumes: 
   authentication-db:
+  authorization-db:
