@@ -16,6 +16,9 @@ class UserLogin(BaseModel):
     email: str
     password: str
 
+class VerifyToken(BaseModel):
+    token: str
+
 class UserOut(BaseModel):
     id: int
     username: str

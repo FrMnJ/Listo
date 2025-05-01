@@ -1,5 +1,5 @@
 from models import User
-from schemas import UserCreate, UserLogin, UserOut
+from schemas import UserCreate, UserLogin, UserOut, VerifyToken
 from fastapi import APIRouter, HTTPException, status
 import auth
 import json
@@ -59,5 +59,23 @@ async def login_user(user_login: UserLogin) -> str:
         "token_type": "Bearer",
         "token": auth.get_token_jwt(user),
     }
-    
+
+@router.post("/verify-token", response_model=dict, status_code=status.HTTP_200_OK) 
+async def verify_token(verify_token: VerifyToken) -> dict:
+    try:
+        payload = auth.verify_token_jwt(verify_token.token)
+        if payload is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid token"
+            )
+        return {
+            "success": True,
+            "message": "Token is valid",
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token"
+        ) from e
     

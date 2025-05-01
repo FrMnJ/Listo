@@ -31,8 +31,11 @@ def verify_token_jwt(token: str) -> dict:
     Verify a JWT token and return the payload.
     """
     try:
-        payload = jwt.decode(token, os.environ.get("JWT_SECRET"), algorithms=["HS256"])
+        payload = jwt.decode(token, os.environ.get("JWT_SECRET", "secret"), algorithms=["HS256"])
         return payload
-    except Exception as e:
-        print(f"Token verification failed: {e}")
+    except jwt.ExpiredSignatureError:
         return None
+    except jwt.InvalidTokenError:
+        return None
+    except Exception as e:
+        raise e
