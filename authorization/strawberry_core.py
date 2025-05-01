@@ -11,3 +11,5 @@ class Query:
     get_role_by_id: Optional[RoleType] = strawberry.field(resolver=Queries.get_role_by_id)
     get_role_by_name: Optional[RoleType] = strawberry.field(resolver=Queries.get_role_by_name)
     permissions: List[RoleType] = strawberry.field(resolver=Queries.get_all_permissions)
+    get_permission_by_id: Optional[RoleType] = strawberry.field(resolver=Queries.get_permission_by_id)
+    get_permission_by_name: Optional[RoleType] = strawberry.field(resolver=Queries.get_permission_by_name)

@@ -53,4 +53,28 @@ class Queries:
         Fetch all permissions from the database.
         """
         permissions = await Permission.all()
-        return [PermissionType(id=permission.id, name=permission.name) for permission in permissions]
+        for permission in permissions:
+            await permission.fetch_related("roles")
+        return [PermissionType(
+                                id=permission.id, 
+                                name=permission.name,
+                            ) for permission in permissions]
+    async def get_permission_by_id(self, id: int) -> PermissionType:
+        """
+        Fetch a permission by its ID from the database.
+        """
+        permission = await Permission.get_or_none(id=id)
+        if permission:
+            await permission.fetch_related("roles")
+            return PermissionType(id=permission.id, name=permission.name)
+        return None
+    
+    async def get_permission_by_name(self, name: str) -> PermissionType:
+        """
+        Fetch a permission by its name from the database.
+        """
+        permission = await Permission.get_or_none(name=name)
+        if permission:
+            await permission.fetch_related("roles")
+            return PermissionType(id=permission.id, name=permission.name)
+        return None
