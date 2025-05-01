@@ -16,7 +16,7 @@ class RoleType:
 class UserRoleType:
     id: int
     user: int
-    role: RoleType
+    roles: List[RoleType] = strawberry.field(default_factory=list)
 
 @strawberry.type
 class RolePermissionType:
