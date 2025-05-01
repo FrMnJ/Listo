@@ -19,12 +19,28 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     """
     return pwd_context.verify(plain_password, hashed_password)
 
-def get_token_jwt(user: User, expires_delta: Optional[timedelta] = None) -> str:
+def get_access_token_jwt(user: User, expires_delta: Optional[timedelta] = None) -> str:
     """
     Generate a JWT token for the user.
     """
-    encoded_jwt = jwt.encode(user.dict(), str(os.environ.get("JWT_SECRET", "secret")), algorithm="HS256")
+    payload = user.dict()
+    payload["exp"] = datetime.now(timezone.utc) + (expires_delta if expires_delta else timedelta(minutes=30))
+    payload["iat"] = datetime.now(timezone.utc)
+    encoded_jwt = jwt.encode(payload, str(os.environ.get("JWT_SECRET", "secret")), algorithm="HS256")
     return encoded_jwt
+
+def get_refresh_token_jwt(user: User, expires_delta: Optional[timedelta] = None) -> str:
+    """
+    Generate a refresh JWT token for the user.
+    """
+    payload = {
+        "user_id": user.id,
+    }
+    payload["exp"] = datetime.now(timezone.utc) + (expires_delta if expires_delta else timedelta(days=7))
+    payload["iat"] = datetime.now(timezone.utc)
+    encoded_jwt = jwt.encode(payload, str(os.environ.get("JWT_SECRET", "secret")), algorithm="HS256")
+    return encoded_jwt
+
 
 def verify_token_jwt(token: str) -> dict:
     """

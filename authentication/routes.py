@@ -1,6 +1,7 @@
 from models import User
 from schemas import UserCreate, UserLogin, UserOut, VerifyToken
 from fastapi import APIRouter, HTTPException, status
+from fastapi.responses import JSONResponse
 import auth
 import json
 
@@ -53,12 +54,22 @@ async def login_user(user_login: UserLogin) -> str:
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid credentials"
         )
-    return {
+    response = JSONResponse(
+        content= {
         "success": True,
         "message": "Login successful",
         "token_type": "Bearer",
-        "token": auth.get_token_jwt(user),
-    }
+        "access_token": auth.get_access_token_jwt(user),
+        "refresh_token": auth.get_refresh_token_jwt(user),
+    })
+    response.set_cookie(
+        key="refresh_token",
+        value=auth.get_refresh_token_jwt(user),
+        httponly=True,
+        secure=True,
+        max_age=60*60*24*7,
+    )
+    return response
 
 @router.post("/verify-token", response_model=dict, status_code=status.HTTP_200_OK) 
 async def verify_token(verify_token: VerifyToken) -> dict:
@@ -78,4 +89,48 @@ async def verify_token(verify_token: VerifyToken) -> dict:
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid token"
         ) from e
+    
+@router.post("/refresh", response_model=dict, status_code=status.HTTP_200_OK)
+async def refresh_token(refresh_token: str) -> dict:
+    payload = auth.verify_token_jwt(refresh_token)
+    if not payload:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Invalid token"
+        )
+    user = await User.get_or_none(id=payload["user_id"])
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Invalid token"
+        )
+    new_access_token = auth.get_access_token_jwt(user)
+    response = JSONResponse(
+        content={
+            "success": True,
+            "message": "Token refreshed successfully",
+            "token_type": "Bearer",
+            "token": new_access_token,
+        }
+    )
+    response.set_cookie(
+        key="refresh_token",
+        value=refresh_token,
+        httponly=True,
+        secure=True,
+        max_age=60*60*24*7,
+    )
+    return response
+
+@router.get("/logout", response_model=dict, status_code=status.HTTP_200_OK)
+async def logout_user() -> dict:
+    response = JSONResponse(
+        content={
+            "success": True,
+            "message": "Logout successful",
+        }
+    )
+    response.delete_cookie("refresh_token")
+    return response
+
     
