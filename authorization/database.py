@@ -1,5 +1,6 @@
 import os
 from tortoise import Tortoise
+from roles_permissions_seeder import seed_roles_permissions
 
 async def init_db():
     host = os.environ.get("POSTGRES_HOST", "localhost")
@@ -13,3 +14,4 @@ async def init_db():
         modules={"models": ["models"]}
     )
     await Tortoise.generate_schemas()
+    await seed_roles_permissions()
