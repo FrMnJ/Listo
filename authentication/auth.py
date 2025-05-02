@@ -26,6 +26,7 @@ def get_access_token_jwt(user: User, expires_delta: Optional[timedelta] = None) 
     payload = user.dict()
     payload["exp"] = datetime.now(timezone.utc) + (expires_delta if expires_delta else timedelta(minutes=30))
     payload["iat"] = datetime.now(timezone.utc)
+    print(os.environ.get("JWT_SECRET", "secret"))
     encoded_jwt = jwt.encode(payload, str(os.environ.get("JWT_SECRET", "secret")), algorithm="HS256")
     return encoded_jwt
 
@@ -47,11 +48,15 @@ def verify_token_jwt(token: str) -> dict:
     Verify a JWT token and return the payload.
     """
     try:
+        print(os.environ.get("JWT_SECRET", "secret"))
         payload = jwt.decode(token, os.environ.get("JWT_SECRET", "secret"), algorithms=["HS256"])
         return payload
     except jwt.ExpiredSignatureError:
+        print("Token has expired")
         return None
     except jwt.InvalidTokenError:
+        print("Invalid token")
         return None
     except Exception as e:
+        print(f"Error verifying token: {e}")
         raise e

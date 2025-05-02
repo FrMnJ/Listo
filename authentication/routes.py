@@ -1,3 +1,4 @@
+from interservice_communication import assign_role
 from models import User
 from schemas import UserCreate, UserLogin, UserOut, VerifyToken
 from fastapi import APIRouter, HTTPException, status
@@ -34,6 +35,12 @@ async def create_user(user: UserCreate) -> User:
         device_used=user.device_used,
         location=user.location
     )
+    if not await assign_role(new_user.id, "user"):
+        await new_user.delete()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to assign role"
+        )
     return {
         "success": True,
         "message": "User created successfully",
@@ -74,14 +81,15 @@ async def login_user(user_login: UserLogin) -> str:
 async def verify_token(verify_token: VerifyToken) -> dict:
     try:
         payload = auth.verify_token_jwt(verify_token.token)
-        if payload is None:
+        print(not payload)
+        if not payload:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid token"
             )
         return {
-            "success": True,
-            "message": "Token is valid",
+            "isValid": True,
+            "user": payload
         }
     except Exception as e:
         raise HTTPException(

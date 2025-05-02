@@ -19,3 +19,4 @@ class UserType:
     url_drive_license: Optional[str] = None
     url_identification: Optional[str] = None
     deleted_at: Optional[str] = None
+    ban_at: Optional[str] = None

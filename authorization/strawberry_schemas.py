@@ -4,7 +4,7 @@ from typing import List, Optional
 @strawberry.input
 class UserRoleInput:
     user_id: int
-    role_id: int
+    role: str
 
 @strawberry.type  
 class UserRoleDelete:

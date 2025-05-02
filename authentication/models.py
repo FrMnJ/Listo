@@ -19,6 +19,7 @@ class User(Model):
     url_drive_license = fields.CharField(max_length=255, null=True)
     url_identification = fields.CharField(max_length=255, null=True)
     deleted_at = fields.DatetimeField(null=True)
+    ban_at = fields.DatetimeField(null=True)
 
     def dict(self) -> dict:
         """Convert the User instance to a dictionary for serialization."""
@@ -38,6 +39,7 @@ class User(Model):
             "url_profile": self.url_profile,
             "url_drive_license": self.url_drive_license,
             "url_identification": self.url_identification,
-            "deleted_at": self.deleted_at
+            "deleted_at": self.deleted_at,
+            "ban_at": self.ban_at,
         }
 

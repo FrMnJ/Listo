@@ -116,7 +116,7 @@ class CreateMutation:
         if not user:
             raise ValueError("User not found")
 
-        role = await Role.get_or_none(id=user_role_input.role_id) 
+        role = await Role.get_or_none(name=user_role_input.role) 
         await role.fetch_related("permissions")
         if not role:
             raise ValueError("Role not found")

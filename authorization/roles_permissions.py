@@ -1,8 +1,6 @@
 ROLES = [
     "admin",
     "user",
-    "car owner", 
-    "renter",
 ]
 
 PERMISSIONS = {
@@ -10,65 +8,92 @@ PERMISSIONS = {
         "list users",
         "ban user",
         "unban user",
-        "review reports",
+        "create review reports",
+
         "list cars",
-        "remove car",
+        "read car",
+        "delete car",
+        "edit car",
         "flag car",
+        "unflag car",
+
         "list rentals",
         "cancel rental",
-        "issue refund",
+
         "list announcements",
+        "read announcement",
         "create announcement",
         "edit announcement",
         "delete announcement",
-        "access analytics",
-        "export reports",
-        "monitor system",
-        "monitor user activity",
-        "manage settings",
-        "access settings",
+
+        #"access analytics",
+        #"export reports",
+        #"monitor system",
+        #"monitor user activity",
+
+        #"edit settings",
+        #"list settings",
+
         "list roles",
         "manage roles",
         "list permissions",
+
         "list disputes",
-        "resolve disputes",
+        "create dispute",
+        "edit dispute",
+        "delete dispute",
+
+        "list dispute resolutions",
+        "read dispute resolution",
+        "create dispute resolution",
+        "edit dispute resolution",
+        "delete dispute resolution",
+
         "list issues",
-        "resolve issues",
+        "read issue",
+        "create issue",
+        "edit issue",
+        "delete issue",
+
+        "list issue resolutions",
+        "read issue resolution",
+        "create issue resolution",
+        "edit issue resolution",
+        "delete issue resolution",
     ],
     "user": [
         "verify identity",
-        "link payment method",
-        "edit profile",
-        "view dashboard",
-        "logout",
-    ],
-    "car owner": [
+        "create payment method",
+
+        "list announcements",
+        "read announcement",
+
+        # Renter
+        "list rentals",
+        "create rental request",
+        "edit rental request",
+        "cancel rental request",
+        "create rental review",
+        "create car owner review",
+
+        # Car owner
+        "manage rental requests",
+        "update car",
+
+        # Cars
         "list cars",
-        "add car",
+        "read car",
+        "search cars",
+        "create car",
         "edit car",
         "remove car",
-        "view rental history",
-        "manage rental requests",
-        "chat with renters",
-        "manage availability",
-        "set pricing",
-        "view earnings",
-        "view payout status",
-        "view upcoming rentals",
-        "report dispute",
-        "report issue",
-    ],
-    "renter": [
-        "list cars",
-        "search cars",
-        "view owner profile",
-        "send rental request",
-        "pay for rental",
-        "modify rental request",
-        "cancel rental request",
-        "chat with owner",
-        "review rental",
-        "review owner",
-        "report issue",
+
+        # User actions
+        "edit user",
+        "view dashboard",
+        "logout",
+        "create dispute",
+        "create issue",
+        "create pay"
     ],
 }
