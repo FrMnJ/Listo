@@ -1,4 +1,8 @@
+version: '3'
+
 services:
+
+  # Authorization Service
   authorization_db:
     image: postgres:latest
     environment:
@@ -7,6 +11,21 @@ services:
       POSTGRES_DB: authorization_db  
     volumes:
       - authorization-db:/var/lib/postgresql/data
+    networks:
+      - backend
+      - gateway
+
+  authorization-service: 
+    build: ./authorization
+    volumes:
+      - ./authorization:/app
+    depends_on:
+      - authorization_db
+    networks:
+      - backend
+      - gateway
+
+  # Authentication Service
   authentication_db:
     image: postgres:latest
     environment:
@@ -15,22 +34,62 @@ services:
       POSTGRES_DB: authentication_db  
     volumes:
       - authentication-db:/var/lib/postgresql/data
+    networks:
+      - backend
+      - gateway
+
   authentication-service: 
     build: ./authentication
     volumes:
       - ./authentication:/app
     depends_on:
       - authentication_db
-    ports:
-      - "8000:8000"
-  authorization-service: 
-    build: ./authorization
+    networks:
+      - backend
+      - gateway
+
+  # Cars Service
+  cars_db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: listo
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: cars_db  
     volumes:
-      - ./authorization:/app
+      - cars-db:/var/lib/postgresql/data
+    networks:
+      - backend
+      - gateway
+
+  cars-service:
+    build: ./cars
+    volumes:
+      - ./cars:/app
     depends_on:
-      - authorization_db
+      - cars_db
+    networks:
+      - backend
+      - gateway
+
+  # NGINX API Gateway
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
     ports:
-      - "8001:8000"
-volumes: 
+      - "8000:80"   # HTTP port
+      - "443:443" # HTTPS port (optional)
+    networks:
+      - backend
+      - gateway
+
+volumes:
   authentication-db:
   authorization-db:
+  cars-db:
+
+networks:
+  backend:
+    driver: bridge
+  gateway:
+    driver: bridge
