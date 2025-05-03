@@ -1,68 +1,22 @@
 from fastapi import FastAPI
+from database import init_db
+import routes as authorization
+from contextlib  import asynccontextmanager
+from dotenv import load_dotenv
+from strawberry.fastapi import GraphQLRouter
+import strawberry
+from strawberry_core import Mutation, Query
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+   load_dotenv()
+   await init_db()
+   yield     
 
-@app.get("/ping")
-async def ping():
-    return {"message": "pong"}
+schema = strawberry.Schema(query=Query, mutation=Mutation)
+graphql_app = GraphQLRouter(schema)
 
-@app.get("/cars")
-async def get_cars(
-        page: int = 1, 
-        limit: int = 10,
-):
-    return 
-    {
-        "status": "success",
-        "total": 3,
-        "page": 1,
-        "per_page": 10,
-        "total_pages": 1,
-        "has_next": False,
-        "has_prev": False,
-        "cars" : [
-            {"id": 1, "make": "Toyota", "model": "Camry", "year": 2020},
-            {"id": 2, "make": "Honda", "model": "Accord", "year": 2019},
-            {"id": 3, "make": "Ford", "model": "Mustang", "year": 2021},
-        ]
-    }
+app = FastAPI(lifespan=lifespan, root_path="/cars")
 
-@app.get("/cars/{car_id}")
-async def get_car(car_id: int):
-    cars = [
-        {"id": 1, "make": "Toyota", "model": "Camry", "year": 2020},
-        {"id": 2, "make": "Honda", "model": "Accord", "year": 2019},
-        {"id": 3, "make": "Ford", "model": "Mustang", "year": 2021},
-    ]
-    for car in cars:
-        if car["id"] == car_id:
-            return {
-                "status": "success",
-                "car": car
-            }
-    return {"error": "Car not found"}
-
-@app.post("/cars")
-async def create_car(car: dict):
-    return {
-            "status": "success",
-            "message": "Car created",
-            "car": car
-           }
-
-@app.put("/cars/{car_id}")
-async def update_car(car_id: int, car: dict):
-    return {
-            "status": "success",
-            "message": "Car updated", 
-            "car_id": car_id, 
-            "car": car
-           }
-
-@app.delete("/cars/{car_id}")
-async def delete_car(car_id: int):
-    return {
-            "status": "success",
-            "message": "Car deleted", 
-            "car_id": car_id
-           }
+app.include_router(graphql_app, prefix="/graphql", tags=["graphql"])
+app.include_router(authorization.router, tags=["authorization"])

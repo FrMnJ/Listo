@@ -1,6 +1,5 @@
 import httpx
 
-
 async def assign_role(user_id: int, role: str) -> bool:
     query = """
         mutation CreateUserRole($userRoleInput: UserRoleInput!) {
